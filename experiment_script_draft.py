@@ -78,23 +78,29 @@ for n,topic in enumerate(topics):
     "topic":topics[n][0],
     "t_story":topics[n][1],
     "n_story":topics[n][2],
-    "t_story_rating":"Na",
-    "n_story_rating":"Na",
+    "t_story_rating":"NA",
+    "n_story_rating":"NA",
     "condition":random_numbers_list[n],
-    "topic_knowledge":"Na",
-    "media_time":"Na",
-    "rating_EB":"Na",
-    "rating_MX":"Na",
-    "rating_politiken":"Na",
-    "rating_weekend_a":"Na",
+    "topic_knowledge":"NA",
+    "media_time":"NA",
+    "rating_EB":"NA",
+    "rating_MX":"NA",
+    "rating_politiken":"NA",
+    "rating_weekend_a":"NA",
     "block_order":k,
-    "rt_text":"Na",
-    "rt_response":"Na"
+    "rt_text":"NA",
+    "rt_response":"NA",
+    "person_characteristics": "NA",
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA"
     }]
 
 
 
-person_stories = ["""person_story_1""", """person_story2"""]
+person_stories = [["""Blue-eyed""","""person_story_1"""], ["""Hayfever""","""person_story2"""]]
 
 person_stories_trials = []
 
@@ -105,21 +111,27 @@ for n,story in enumerate(person_stories):
     'ID': ID,
     "Nationality": nationality,
     'gender': gender,    
-    "topic":"",
-    "t_story":person_stories[n],
-    "n_story":"Na",
-    "t_story_rating":"Na",
-    "n_story_rating":"Na",
-    "condition":"Na",
-    "topic_knowledge":"Na",
-    "media_time":"Na",
-    "rating_EB":"Na",
-    "rating_MX":"Na",
-    "rating_politiken":"Na",
-    "rating_weekend_a":"Na",
+    "topic":story[0],
+    "t_story":story[1],
+    "n_story":"NA",
+    "t_story_rating":"NA",
+    "n_story_rating":"NA",
+    "condition":"NA",
+    "topic_knowledge":"NA",
+    "media_time":"NA",
+    "rating_EB":"NA",
+    "rating_MX":"NA",
+    "rating_politiken":"NA",
+    "rating_weekend_a":"NA",
     "block_order":k,
-    "rt_text":"Na",
-    "rt_response":"Na"
+    "rt_text":"NA",
+    "rt_response":"NA",
+    "person_characteristics": "NA",
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA"
     }]
 
 # Randomize order
@@ -274,21 +286,27 @@ news_rating = {
     'ID': ID,
     "Nationality": nationality,
     'gender': gender,    
-    "topic":"Na",
-    "t_story":"Na",
-    "n_story":"Na",
+    "topic":"NA",
+    "t_story":"NA",
+    "n_story":"NA",
     "t_story_rating":"",
-    "n_story_rating":"Na",
-    "condition":"Na",
-    "topic_knowledge":"Na",
-    "media_time":"Na",
-    "rating_EB":"Na",
-    "rating_MX":"Na",
-    "rating_politiken":"Na",
-    "rating_weekend_a":"Na",
-    "block_order":"na",
-    "rt_text":"Na",
-    "rt_response":"Na"
+    "n_story_rating":"NA",
+    "condition":"NA",
+    "topic_knowledge":"NA",
+    "media_time":"NA",
+    "rating_EB":"NA",
+    "rating_MX":"NA",
+    "rating_politiken":"NA",
+    "rating_weekend_a":"NA",
+    "block_order":"NA",
+    "rt_text":"NA",
+    "rt_response":"NA",
+    "person_characteristics": "NA",
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA", 
+    "person_characteristics": "NA"
     }
     
     
@@ -298,6 +316,26 @@ news_rating["rating_MX"]=rate_newspaper("Metro Express")
 news_rating["rating_politiken"]=rate_newspaper("Politiken")
 news_rating["rating_weekend_a"]=rate_newspaper("Weekend Avisen")
 news_rating["media_time"] = rate_media()
+
+pers_char_rating = visual.RatingScale(win, markerColor = "White", scale = "",low = 1, high = 2, labels = ["YES", "NO"])
+
+def pers_char(x):
+    full_txt = x
+    msg = visual.TextStim(win, text = full_txt, pos=(0,0.1))   
+    
+    pers_char_rating.reset()
+    while pers_char_rating.noResponse: 
+        pers_char_rating.draw() 
+        msg.draw()
+        win.flip()
+    return(pers_char_rating.getRating())
+
+news_rating["person_characteristics"]=pers_char("Do you have blue eyes?")
+news_rating["person_characteristics"]=pers_char("Do you have hayfever?")
+news_rating["person_characteristics"]=pers_char("Did you grow up on the countryside?")
+news_rating["person_characteristics"]=pers_char("Did you have pets as a child?")
+news_rating["person_characteristics"]=pers_char("????")
+news_rating["person_characteristics"]=pers_char("????")
 
 writer.write(news_rating)
 
