@@ -105,7 +105,7 @@ u"""A recent article in the German newspaper Die Zeit describes how polish crimi
 
 ["""acid rain""", 
 
-u"""A so far unseen concentration of acid in rain was reported last year near Denmark. International news stations announced that Polish weather stations reported record high concentrations of acid. Why the problem of acid rain is rising near Denmark is unknown, but it’s reasonable to assume that the problem will spread due to the heavy industries found across Europe. Inhaling increased amounts of acid is dangerous as it damages our respiration system. It is therefore worth considering if we should employ an alarm system in case of dangerous rain.""", 
+u"""A so far unseen concentration of acid in rain was reported last year near Denmark. International news stations announced that Polish weather stations reported record high concentrations of acid. Why the problem of acid rain is rising near Denmark is unknown, but it is reasonable to assume that the problem will spread due to the heavy industries found across Europe. Inhaling increased amounts of acid is dangerous as it damages our respiration system. It is therefore worth considering if we should employ an alarm system in case of dangerous rain.""", 
 
 u"""Last year the highest concentration of acid in rainwater was measured in Polen. Not since the aftermath of Chernobyl has a higher concentration of acid been measured in Europe. Acid rain is produced by industries with a heavy use of chemicals. What the exact reason for the increase of acid is, is still not known. The rain is not only damaging to the surface of materials but can also cause damage to the human respiration system. Therefore the Polish government is considering an alarming system to in cases of extreme acid rain."""]]
 
@@ -297,8 +297,7 @@ def person_stories_function():
 newspaper_rating = visual.RatingScale(win, markerColor = "White", scale = "",low = 0, high = 5, labels = ["very incompetent","very competent"])
 
 def rate_newspaper(txt):
-    full_txt = """On a scale from 1 to 5, how competent do you think " + txt + " is?
-                        If you are not familiar with the newspaper choose ZERO """
+    full_txt = "On a scale from 1 to 5, how competent do you think " + txt + " is?\nIf you are not familiar with the newspaper choose ZERO "
     msg = visual.TextStim(win, text = full_txt, pos=(0,0.1))   
     
     newspaper_rating.reset()
@@ -311,7 +310,8 @@ def rate_newspaper(txt):
 media_rating = visual.RatingScale(win, markerColor = "White", scale = "",low = 1, high = 5, labels = ["0-2", "2-4","4-6""6-8","8+"])
 
 def rate_media():
-    full_txt = "How many hours per week do you spend following the news?"
+    
+    full_txt = "How many hours per week do you spend following the news?\n 1: 0 to 2 hours \n 2: 2 to 4 hours \n 3: 4-6 hours \n 4: 6 to 8 hours \n 5: 8+ hours"
     msg = visual.TextStim(win, text = full_txt, pos=(0,0.1))   
     
     media_rating.reset()
@@ -396,7 +396,7 @@ news_rating["hayfever"]=pers_char("Do you have hayfever?")
 news_rating["countryside"]=pers_char("Did you grow up on the countryside?")
 news_rating["pets"]=pers_char("Did you have pets as a child?")
 news_rating["infertility"]=pers_char("Do you keep your iPhone in your pocket?")
-news_rating["sleep"]=pers_char("Do you sleep on your stomache?")
+news_rating["sleep"]=pers_char("Do you sometimes sleep on your stomache?")
 
 writer.write(news_rating)
 
