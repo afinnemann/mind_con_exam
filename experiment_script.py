@@ -103,16 +103,20 @@ u"""The Spanish media El Mundo reports that a bacteria-mutation has put down roo
 u"""A recent article in the German newspaper Die Zeit describes how polish criminals have settled down in Eastern Germany. According to Die Zeit the so called Polish Mafia is very structured in their approach and have quickly gained influence on the drug and blackmail market in several East German cities.They have become particularly notorious for their use of so called "protection" money. Mafia members visit local shops and cafes and require a fee to be paid in return for protection. It is unclear whom they are protected from when they pay, but it is clear that if they refuse to pay, their shops and cafes are likely to be vandalized by mafia members. """], 
 
 
-["""topic""", 
+["""acid rain""", 
 
-"""historie1""", 
+"""A so far unseen concentration of acid in rain was reported last year near Denmark. International news stations announced that Polish weather stations reported record high concentrations. Why the problem of acid rain is rising near denmark is unknown, but it’s reasonable to assume that the problem will spread due to the heavy industries found across Europe. Inhaling increased amounts of acid is dangerous as it damages our respiration system. It’s therefore worth considering if we should employ an alarm system in case of dangerous rain.""", 
 
-"""historie2"""]]
+"""Last year the highest concentration of acid in rainwater was measured in Polen. Not since the aftermath of Chernobyl has a higher concentration of acid been measured in Europe. Acid rain is produced by industries with a heavy use of chemicals. What the exact reason for the increase of acid is, is still not known. The rain is not only damaging to the surface of materials but can also cause damage to the human respiration system. Therefore the Polish government is considering an alarming system to in cases of extreme acid rain."""]]
 
 k = random.randint(0,1)
 
 #equal number of ones and zeroes. Ensures even distribution of conditions, i.e. if threat or neutral is shown first
-random_numbers_list = [1,0,1,0,0,1]
+random_number_list = [1,1,1,0,0,0]
+
+random_number_list = random.sample(random_number_list, len(random_number_list))
+
+#random_number_list = random.shuffle(random_number_list)
 
 for n,topic in enumerate(topics):
   # Add a dictionary for every trial
@@ -125,7 +129,7 @@ for n,topic in enumerate(topics):
     "n_story":topics[n][2],
     "t_story_rating":"NA",
     "n_story_rating":"NA",
-    "condition":random_numbers_list[n],
+    "condition":random_number_list[n],
     "topic_knowledge":"NA",
     "media_time":"NA",
     "rating_EB":"NA",
@@ -295,10 +299,11 @@ def person_stories_function():
         writer.write(trial)
 
 
-newspaper_rating = visual.RatingScale(win, markerColor = "White", scale = "",low = 1, high = 5, labels = ["very incompetent","very competent"])
+newspaper_rating = visual.RatingScale(win, markerColor = "White", scale = "",low = 0, high = 5, labels = ["very incompetent","very competent"])
 
 def rate_newspaper(txt):
-    full_txt = "On a scale from 0 to 5, how competent do you think " + txt + " is?"
+    full_txt = """On a scale from 1 to 5, how competent do you think " + txt + " is?
+                        If you are not familiar with the newspaper choose ZERO """
     msg = visual.TextStim(win, text = full_txt, pos=(0,0.1))   
     
     newspaper_rating.reset()
@@ -365,7 +370,7 @@ news_rating = {
     "topic":"NA",
     "t_story":"NA",
     "n_story":"NA",
-    "t_story_rating":"",
+    "t_story_rating":"NA",
     "n_story_rating":"NA",
     "condition":"NA",
     "topic_knowledge":"NA",
