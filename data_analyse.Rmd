@@ -1,0 +1,147 @@
+---
+  title: "Data analyse"
+author: "Adam finnemann & Line"
+date: "November 20, 2017"
+---
+  
+  
+  
+
+```{r}
+library(tidyverse)
+library(lmerTest)
+setwd("~/cogsci/Mind and consciousness/exam/python")
+da <- read.delim("preprocessed_data.csv", sep = ",")
+
+```
+
+Revoming people without knowledge of newspapers
+```{r}
+da <- da %>% 
+  filter(competence != 0) %>% 
+  mutate(condition = recode(condition, "0" = "threat_second", "1" = "threat_first"),
+         condition = as.factor(condition))
+```
+
+analysing outliers
+```{r}
+da %>%  filter(rt_text < 10)
+
+da = da %>%
+  filter(rt_text > 10)
+```
+
+
+
+```{r}
+
+base = lmer(competence ~ 1 + (1|ID), da)
+more_random = lmer(competence ~ 1 + (1|ID) + (1|type), da)
+threat = lmer(competence ~ threat + (1|ID)+ (1|type), da)
+media = lmer(competence ~ threat + media_time+ (1|ID) + (1|type), da)
+gender = lmer(competence ~ threat + media_time+ gender + (1|ID) + (1|type), da)
+anova(base, topic_random, more_random, threat, media, gender)
+
+summary(media)
+r.squaredGLMM(media)
+
+```
+
+```{r}
+t_subset <- da %>% 
+  filter(type == "contrast")
+summary(lmer(competence ~ condition*threat + (1|ID), t_subset))
+
+
+```
+Analysis of person stories
+```{r}
+person = da %>% 
+  filter(is.na(condition))
+summary(lmer(competence ~ threat + (1|ID), person))
+```
+
+
+
+```{r}
+ggplot(da, aes(threat, competence)) +
+  geom_bar(stat = "summary", fun.y = "mean", aes(fill = threat)) +
+  geom_errorbar(stat = "summary", fun.data = "mean_se", width = 0.1)
+
+```
+
+
+```{r}
+ggplot(da, aes(media_time, competence)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  geom_jitter()
+
+```
+
+
+```{r}
+glmer_mdl <- glmer(threat ~ news_paper + (1|ID), da, family = "binomial")
+
+inv.logit(glmer_mdl@beta)
+summary(glmer_mdl)
+```
+
+```{r}
+
+glmer_mdl
+
+predict(glmer_mdl)
+
+
+da <- da %>% 
+      mutate(predictions_perc = inv.logit(predict(glmer_mdl)),
+             predictions = ifelse(predictions_perc > 0.5, "threat","safe"),
+             predictions = as.factor(predictions))
+    
+library(caret)
+    conf_mat <- caret::confusionMatrix(data = da$predictions, reference = da$threat, positive = "threat") 
+caret::confusionMatrix(data = da$predictions, reference = da$threat, positive = "threat") 
+
+library(boot)
+minv.logit(glmer_mdl@beta)
+
+
+  #creating folds  
+  Subjects = unique(da$Subject)
+  folds <- createFolds(Subjects, 5)
+  
+  #running loop
+  cross_val <- sapply(seq_along(folds), function(x) {
+    
+    train_folds = filter(da, !(as.numeric(Subject) %in% folds[[x]]))
+    predict_fold = filter(da, as.numeric(Subject) %in% folds[[x]])
+    
+    train_model <-  glmer(model_formula, train_folds ,family="binomial")
+    
+    
+    predict_fold <- predict_fold %>% 
+      mutate(predictions_perc = inv.logit(predict(train_model, predict_fold, allow.new.levels = T)),
+             predictions = ifelse(predictions_perc > 0.5, "Schizophrenia","Control"),
+             predictions = as.factor(predictions))
+    
+    conf_mat <- caret::confusionMatrix(data = predict_fold$predictions, reference = predict_fold$Diagnosis, positive = "Schizophrenia") 
+    
+    accuracy <- conf_mat$overall[1]
+    sensitivity <- conf_mat$byClass[1]
+    specificity <- conf_mat$byClass[2]
+    
+    predict_fold$Diagnosis <- as.factor(predict_fold$Diagnosis)
+    rocCurve <- roc(response = predict_fold$Diagnosis,   predictor = inv.logit(test))
+    
+    auc(rocCurve) 
+    
+    
+    fixed_ef <- fixef(train_model) 
+    
+    output <- c(accuracy, sensitivity, specificity, fixed_ef)
+    
+
+
+```
+
