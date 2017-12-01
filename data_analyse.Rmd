@@ -15,7 +15,7 @@ da <- read.delim("preprocessed_data.csv", sep = ",")
 
 ```
 
-Revoming people without knowledge of newspapers
+Removing people without knowledge of newspapers
 ```{r}
 da <- da %>% 
   filter(competence != 0) %>% 
@@ -28,37 +28,40 @@ analysing outliers
 da %>%  filter(rt_text < 10)
 
 da = da %>%
-  filter(rt_text > 10)
+  filter(rt_text > 10) 
 ```
 
-
-
+Assuming we did two experiment
 ```{r}
+contrast_exp = da %>% 
+  filter(type =="contrast")
 
-base = lmer(competence ~ 1 + (1|ID), da)
-more_random = lmer(competence ~ 1 + (1|ID) + (1|type), da)
-threat = lmer(competence ~ threat + (1|ID)+ (1|type), da)
-media = lmer(competence ~ threat + media_time+ (1|ID) + (1|type), da)
-gender = lmer(competence ~ threat + media_time+ gender + (1|ID) + (1|type), da)
-anova(base, topic_random, more_random, threat, media, gender)
-
-summary(media)
-r.squaredGLMM(media)
+person_exp = da %>% 
+  filter(type =="person")
 
 ```
 
+Analysis of person exp:
 ```{r}
-t_subset <- da %>% 
-  filter(type == "contrast")
-summary(lmer(competence ~ condition*threat + (1|ID), t_subset))
+mdl1 = lmer(competence ~ threat +(1|ID) + (1|topic),person_exp)
+
+summary(mdl1)
+```
 
 
+analysis of contrasts
+```{r}
+
+mdl2 = lmer(competence ~ threat*condition +(threat|ID) + (1|topic),contrast_exp)
+summary(mdl2)
 ```
 Analysis of person stories
 ```{r}
-person = da %>% 
-  filter(is.na(condition))
-summary(lmer(competence ~ threat + (1|ID), person))
+summary(lm(competence ~ media_time, da))
+
+
+
+
 ```
 
 
