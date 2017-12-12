@@ -13,26 +13,19 @@ library(lmerTest)
 setwd("~/cogsci/Mind and consciousness/exam/python")
 da <- read.delim("preprocessed_data.csv", sep = ",")
 
-```
+da %>% 
+  filter(!duplicated(ID)) %>% 
+  group_by(gender) %>% 
+  tally()
 
-Removing people without knowledge of newspapers
-```{r}
-da <- da %>% 
-  filter(competence != 0) %>% 
-  mutate(condition = recode(condition, "0" = "threat_second", "1" = "threat_first"),
-         condition = as.factor(condition))
-```
+da %>% 
+  filter(!duplicated(ID)) %>% 
+  group_by(Nationality) %>% 
+  tally()
 
-analysing outliers
-```{r}
-da %>%  filter(rt_text < 10)
 
-da = da %>%
-  filter(rt_text > 10) 
-```
+#Assuming we did two experiment
 
-Assuming we did two experiment
-```{r}
 contrast_exp = da %>% 
   filter(type =="contrast")
 
@@ -41,45 +34,219 @@ person_exp = da %>%
 
 ```
 
-Analysis of person exp:
-```{r}
-mdl1 = lmer(competence ~ threat +(1|ID) + (1|topic),person_exp)
 
-summary(mdl1)
+##Analysis of contrast experiment
+
+Removing people without knowledge of newspapers
+```{r}
+contrast_exp <- contrast_exp  %>% 
+  filter(competence != 0) %>% 
+  mutate(condition = as.factor(condition),
+         condition = dplyr::recode(condition, "0" = "threat_second", "1" = "threat_first"))
+
+
+
+
 ```
 
 
-analysis of contrasts
-```{r}
+Analysing reading times
 
-mdl2 = lmer(competence ~ threat*condition +(threat|ID) + (1|topic),contrast_exp)
+```{r}
+contrast_exp  %>%
+  group_by(condition) %>% 
+  summarise(mean = mean(rt_text),
+            sd = sd(rt_text))
+
+
+
+```
+We see no major difference between first and second article
+
+```{r}
+contrast_exp  %>%
+  summarise(mean = mean(rt_text),
+            sd = sd(rt_text))
+
+```
+
+
+#analysing outliers
+```{r}
+contrast_exp %>%  filter(rt_text < 10)
+
+contrast_exp = contrast_exp %>%
+  filter(rt_text > 10) 
+```
+
+Demographic descriptors
+```{r}
+contrast_exp %>% 
+  filter(!duplicated(ID)) %>% 
+  group_by(gender) %>% 
+  tally()
+```
+24 F and 9 M left after preprocessing. 6 excluded
+
+```{r}
+contrast_exp %>% 
+  filter(!duplicated(ID)) %>% 
+  group_by(Nationality) %>% 
+  tally()
+
+```
+
+
+
+
+```{r}
+contrast_exp$ID = as.factor(contrast_exp$ID)
+mdl2 = lmer(competence ~ threat*condition +(threat|ID) + (threat|topic),contrast_exp)
 summary(mdl2)
 ```
-Analysis of person stories
+
+
+
+
+
+
+
+
 ```{r}
-summary(lm(competence ~ media_time, da))
+leveneTest(residuals(mdl2) ~ as.factor(contrast_exp$ID))
+```
+```{r}
+leveneTest(residuals(mdl2) ~ as.factor(contrast_exp$topic))
+```
+
+```{r}
+leveneTest(residuals(mdl2) ~ as.factor(contrast_exp$threat))
+
+```
+```{r}
+leveneTest(residuals(mdl2) ~ as.factor(contrast_exp$condition))
+
+```
+
+##Power analysis
+
+```{r}
+library(pacman)
+p_load(tidyverse, stringr, simr, lmerTest, simr)
+
+test_mdl = lmer(competence ~ threat + condition +(threat|ID) ,contrast_exp)
+
+powersim_threat = powerSim(test_mdl, fixed("threat"), nsim=200)
+
+powersim_threat
+```
+
+```{r}
+powersim_threat = powerSim(test_mdl, fixed("condition"), nsim=200)
+
+powersim_threat
+
+```
+```{r}
+test_mdl = lmer(competence ~ threat*condition +(threat|ID) ,contrast_exp)
+
+powersim_threat = powerSim(test_mdl, fixed("threat:condition"), nsim=200)
+
+powersim_threat
+```
+
+
+###Analysis of person stories
+Removing people without knowledge of newspapers
+
+
+```{r}
+person_exp <- person_exp  %>% 
+  filter(competence != 0)
+
+```
+
+
+analysing outliers
+```{r}
+person_exp %>%  filter(rt_text < 10)
 
 
 
+
+person_exp = person_exp %>%
+  filter(rt_text > 10) 
+```
+
+```{r}
+person_exp %>% 
+  group_by(threat) %>% 
+  tally()
+
+person_exp %>% 
+  group_by(topic, threat) %>% 
+  tally()
+```
+
+
+```{r}
+mdl3 = lmer(competence ~ threat + (threat|ID) + (threat|topic), person_exp)
+
+summary(mdl3)
+
+
+
+```
+
+Checking for assumptions:
+Homoskedasticity (homogenity of variance) using levene's test
+```{r}
+
+leveneTest(residuals(mdl3) ~ as.factor(person_exp$ID))
+```
+```{r}
+leveneTest(residuals(mdl3) ~ as.factor(person_exp$topic))
+```
+
+```{r}
+leveneTest(residuals(mdl3) ~ as.factor(person_exp$threat))
+```
+
+
+
+Assumption of normality
+```{r}
+library(lattice)
+qqmath(mdl3)
+
+library(pastecs)
+
+stat.desc(resid(mdl3), norm = T, basic = F)
+
+shapiro.test(resid(mdl3))
+
+stat.desc(resid(mdl3), norm = T)
+
+hist(resid(mdl3))
+shapiro.test(resid(mdl3))
 
 ```
 
 
 
 ```{r}
-ggplot(da, aes(threat, competence)) +
+ggplot(person_exp, aes(threat, competence)) +
   geom_bar(stat = "summary", fun.y = "mean", aes(fill = threat)) +
   geom_errorbar(stat = "summary", fun.data = "mean_se", width = 0.1)
 
 ```
 
 
-```{r}
-ggplot(da, aes(media_time, competence)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  geom_jitter()
 
+
+```{r}
+library(sjPlot)
+sjp.lmer(mdl3, type = "fe.cor")
 ```
 
 

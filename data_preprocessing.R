@@ -36,7 +36,7 @@ df <- df %>%
          sleep =as.factor(sleep))
 
 df <- df %>% 
-          mutate(pets = recode(pets, "1" = "threat", "2" = "safe"),
+          mutate(pets = recode(pets, "1" = "safe", "2" = "threat"),
                  infertility = recode(infertility, "1" = "threat", "2" = "safe"),
                  countryside= recode(countryside, "1" = "threat", "2" = "safe"),
                  hayfever = recode(hayfever, "1" = "threat", "2" = "safe"),
